@@ -1,0 +1,35 @@
+{{ define "views/login.html" }}
+
+{{ template "layouts/header.html" . }}
+
+<div class="page">
+
+    <div style="width: 50%; margin: auto;">
+
+        <form action="/login" method="post">
+            
+            {{ if .content }}
+                <div class="alert alert-danger" role="alert">
+                {{.content}}
+                </div>
+            {{ end }}
+
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input name="username" value="{{ .Username }}" class="form-control form-control-lg" type="text"
+                    placeholder="username...">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input name="password" class="form-control form-control-lg" type="password">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+    </div>
+
+</div>
+
+{{ template "layouts/footer.html" .}}
+
+{{ end }}

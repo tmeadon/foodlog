@@ -1,0 +1,9 @@
+div.page {
+    /* color: black; */
+    margin: 3%;
+}
+
+.set-input-addon {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

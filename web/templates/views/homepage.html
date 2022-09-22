@@ -1,0 +1,97 @@
+{{ define "views/homepage.html" }}
+
+{{ template "layouts/header.html" . }}
+
+{{ template "partials/nav.html" . }}
+
+
+<div class="page">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newEntryModal">
+        Add
+    </button>
+
+    {{ if .Error }}
+    <div class="alert alert-danger" role="alert">
+        {{ .Error }}
+    </div>
+    {{ end }}
+
+    <table data-toggle="table" data-search="true" data-sortable="true" data-show-columns="true" data-pagination="true"
+        data-page-size="30">
+        <thead>
+            <tr>
+                <th data-sortable="true">Time</th>
+                <th data-sortable="true">Food</th>
+                <th data-sortable="true">Notes</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Entries }}
+            <tr>
+                <td>{{ .Time | FormatEntryDate }}</td>
+                <td>{{ .Food }}</td>
+                <td>{{ .Notes }}</td>
+                <td>
+                    <button type="button" class="btn btn-danger" onclick='deleteEntry("{{ .Id }}", "{{ .Food }}")'>Delete</button>
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+
+    <!-- New User Modal -->
+    <div class="modal fade" id="newEntryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Entry</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="newEntryForm" action="/entry" method="post" class="needs-validation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Time</label>
+                            <input name="time" id="datetimepicker" 
+                                class="form-control form-control-lg" type="datetime-local" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="food" class="form-label">Food</label>
+                            <input name="food" value="" class="form-control form-control-lg" type="text" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <input name="notes" value="" class="form-control form-control-lg" type="text">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" id="new_btn_submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script>
+    Date.prototype.toDateInputValue = (function () {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toISOString();
+    });
+    document.getElementById('datetimepicker').value = new Date().toDateInputValue();
+
+    function deleteEntry(id, food) {
+        if (confirm(`Are you sure you want to delete entry for ${food}?`) == true) {
+            fetch(`/entry/${id}`, { method: "DELETE" })
+            window.location.href = "/"
+        }
+    }
+</script>
+
+{{ template "layouts/footer.html" . }}
+
+{{ end }}
