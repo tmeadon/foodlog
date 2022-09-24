@@ -12,5 +12,5 @@ func TemplateFuncs() template.FuncMap {
 }
 
 func formatEntryDate(d time.Time) string {
-	return d.Format("Monday, 1 January 2006 at 15:04")
+	return d.Format("Monday, 2 January 2006 at 15:04")
 }
