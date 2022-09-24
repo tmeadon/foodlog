@@ -31,7 +31,6 @@
             <tr>
                 <td>{{ .Time | FormatEntryDate }}</td>
                 <td>{{ .Food }}</td>
-                <td>{{ .Notes }}</td>
                 <td>
                     <button type="button" class="btn btn-danger" onclick='deleteEntry("{{ .Id }}", "{{ .Food }}")'>Delete</button>
                 </td>
@@ -40,7 +39,7 @@
         </tbody>
     </table>
 
-    <!-- New User Modal -->
+    <!-- New Entry Modal -->
     <div class="modal fade" id="newEntryModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -58,10 +57,6 @@
                         <div class="mb-3">
                             <label for="food" class="form-label">Food</label>
                             <input name="food" value="" class="form-control form-control-lg" type="text" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Notes</label>
-                            <input name="notes" value="" class="form-control form-control-lg" type="text">
                         </div>
                     </div>
                     <div class="modal-footer">
