@@ -54,7 +54,7 @@ func insertEntry(entry *LogEntry) error {
 }
 
 func updateEntry(entry *LogEntry) error {
-	_, err := DB.NamedExec(`update user set user_id=:user_id, time=:time, food=:food, notes=:notes where id = :id`,
+	_, err := DB.NamedExec(`update logentry set user_id=:user_id, time=:time, food=:food, notes=:notes where id = :id`,
 		map[string]interface{}{
 			"user_id": entry.UserId,
 			"time":    entry.Time,

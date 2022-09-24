@@ -16,6 +16,7 @@ func (c *Controller) loadHomepageRoutes() {
 	c.privateRoutes.GET("/", c.homepage)
 	c.privateRoutes.POST("/entry", c.newEntry)
 	c.privateRoutes.DELETE("/entry/:id", c.deleteEntry)
+	c.privateRoutes.POST("/entry/:id", c.editEntry)
 }
 
 func (c *Controller) homepage(ctx *gin.Context) {
@@ -98,4 +99,51 @@ func (c *Controller) deleteEntry(ctx *gin.Context) {
 		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
+}
+
+func (c *Controller) editEntry(ctx *gin.Context) {
+	user := middleware.CurrentUser(ctx)
+
+	entryId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Printf("failed converting id param: %v", err)
+		ctx.Redirect(http.StatusFound, "/")
+	}
+
+	entry, err := data.GetEntryById(entryId)
+	if err != nil {
+		if errors.Is(err, data.ErrNotFound) {
+			log.Printf("entry with id %v not found in database", entryId)
+			ctx.Redirect(http.StatusFound, "/")
+		} else {
+			log.Printf("failed to find entry with id %v in database: %v", entryId, err)
+			ctx.Redirect(http.StatusFound, "/")
+		}
+		return
+	}
+
+	if entry.UserId != user.Id {
+		log.Printf("entry with id %v does not belong to current user %v", entryId, user.Username)
+		ctx.Redirect(http.StatusFound, "/")
+		return
+	}
+
+	eattime, err := time.Parse("2006-01-02T15:04", ctx.PostForm("time"))
+	if err != nil {
+		log.Printf("failed parsing time %v: %v", ctx.PostForm("time"), err)
+		ctx.HTML(http.StatusBadRequest, "views/homepage.html", gin.H{"Username": user.Username, "Error": "Invalid time submitted"})
+		return
+	}
+
+	entry.Time = eattime
+	entry.Food = ctx.PostForm("food")
+
+	err = data.SaveEntry(entry)
+	if err != nil {
+		log.Printf("failed saving entry %#v: %v", entry, err)
+		ctx.HTML(http.StatusBadRequest, "views/homepage.html", gin.H{"Username": user.Username, "Error": "Something went wrong"})
+		return
+	}
+
+	ctx.Redirect(http.StatusFound, "/")
 }

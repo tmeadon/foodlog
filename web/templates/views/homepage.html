@@ -4,7 +4,6 @@
 
 {{ template "partials/nav.html" . }}
 
-
 <div class="page">
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newEntryModal">
         Add
@@ -32,6 +31,7 @@
                 <td>{{ .Time | FormatEntryDate }}</td>
                 <td>{{ .Food }}</td>
                 <td>
+                    <button type="button" class="btn btn-primary" onclick='editEntry("{{ .Id }}")'>Edit</button>
                     <button type="button" class="btn btn-danger" onclick='deleteEntry("{{ .Id }}", "{{ .Food }}")'>Delete</button>
                 </td>
             </tr>
@@ -68,6 +68,35 @@
         </div>
     </div>
 
+     <!-- Edit Entry Modal -->
+     <div class="modal fade" id="editEntryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Entry</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editEntryForm" action="" method="post" class="needs-validation">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Time</label>
+                            <input name="time" id="editdatetimepicker" 
+                                class="form-control form-control-lg" type="datetime-local" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="food" class="form-label">Food</label>
+                            <input name="food" id="editFood" value="" class="form-control form-control-lg" type="text" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" id="new_btn_submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
 </div>
 
@@ -84,6 +113,29 @@
             fetch(`/entry/${id}`, { method: "DELETE" })
             window.location.href = "/"
         }
+    }
+
+    var entries = []
+
+    {{ range .Entries }}
+        entries.push({
+            id: '{{ .Id }}',
+            time: '{{ .Time }}',
+            food: '{{ .Food }}'
+        })
+    {{ end }}
+
+    function editEntry(id) {
+        let entry = entries.find(e => e.id === id)
+
+        document.getElementById('editEntryForm').action = `/entry/${id}`
+        document.getElementById('editdatetimepicker').value = entry.time
+        document.getElementById('editFood').value = entry.food
+
+        let myModal = new bootstrap.Modal(document.getElementById('editEntryModal'), {
+            keyboard: false
+        })
+        myModal.show()
     }
 </script>
 
